@@ -1,0 +1,54 @@
+{
+  "description" : "Parse NJX log events",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": ["%{GREEDYDATA}Event:%{SPACE}%{NOTSPACE:session}%{SPACE}/%{NOTSPACE:application}/%{NOTSPACE:uicomp}/%{NOTSPACE:page}%{SPACE}%{NOTSPACE:event}%{SPACE}%{NUMBER:duration:int}"]
+      }
+    },
+    {
+      "convert": {
+        "field" : "session",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "field" : "application",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "field" : "uicomp",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "field" : "page",
+        "type": "string"
+      }
+    },
+    {
+      "convert": {
+        "field" : "event",
+        "type": "string"
+      }
+    },
+    {
+      "gsub": {
+        "field": "event",
+        "pattern": "\\[.*\\]",
+        "replacement": ""
+      }
+    },
+    {
+      "convert": {
+        "field" : "duration",
+        "type": "integer"
+      }
+    }
+  ]
+}

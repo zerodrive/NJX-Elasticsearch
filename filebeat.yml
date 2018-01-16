@@ -1,0 +1,40 @@
+# Here we define the path and file patterns of the log files
+# we want to watch.
+
+filebeat.prospectors:
+  - type: log
+    enabled: true
+    paths:
+      - /usr/share/filebeat/fblogs/localhost.*11.log
+
+# Here we define the host and port of Elasticsearch.
+# If we run Filebeat in a container, we need first to determine the
+# IP address of the host machine as it is seen from inside the container.
+# This is done with the command "ip addr show docker0"
+
+# Also we define the name of the pipeline that parses the log lines.
+
+output.elasticsearch:
+  hosts: ['172.17.0.1:9200']
+  pipeline: 'njx-pipeline'
+
+# This is optional. We can use this logging information for debugging,
+# if Filebeat does not work as expected.
+
+logging:
+  level: warning
+  to_files: true
+  files:
+    path: /var/log/filebeat
+    name: beat.log
+    keepfiles: 7
+    rotateeverybytes: 10485760 # 10 MB
+  level: debug 
+  selectors: ["*"]
+
+# With this filter we make sure that Filebeat processes
+# only the log records from our servlet filter.
+
+processors:
+  - drop_event.when.not.regexp:
+      message: '^.*Event:.*'
